@@ -6,10 +6,39 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  businesses  Business[]
+  subscription Subscription?
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  address     String
+  lat         Float
+  lng         Float
+  rating      Float?
+  gmbId       String? // link to Google My Business ID
+  owner       User     @relation(fields: [ownerId], references: [id])
+  ownerId     String
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  plan      String   // free, pro, enterprise
+  status    String   // active, cancelled
+}
+
